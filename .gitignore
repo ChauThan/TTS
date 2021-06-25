@@ -133,6 +133,7 @@ TTS/tts/layers/glow_tts/monotonic_align/core.c
 .vscode-upload.json
 temp_build/*
 <<<<<<< HEAD
+<<<<<<< HEAD
 recipes/*
 
 # nohup logs
@@ -141,3 +142,7 @@ recipes/*
 
 recipes/infore/train-data/*
 >>>>>>> update git ignore
+=======
+
+recipes/infore/train-data/*
+>>>>>>> 3e1e691d24a0bfc0a3ac3d520e45936b1c749ca2
