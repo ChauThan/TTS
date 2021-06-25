@@ -132,7 +132,12 @@ notebooks/data/*
 TTS/tts/layers/glow_tts/monotonic_align/core.c
 .vscode-upload.json
 temp_build/*
+<<<<<<< HEAD
 recipes/*
 
 # nohup logs
 *.out
+=======
+
+recipes/infore/train-data/*
+>>>>>>> update git ignore
