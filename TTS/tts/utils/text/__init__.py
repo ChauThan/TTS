@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import re
+import phonemizer
 
 from packaging import version
-
+from phonemizer.phonemize import phonemize
 from TTS.tts.utils.text import cleaners
 from TTS.tts.utils.text.chinese_mandarin.phonemizer import chinese_text_to_phonemes
 from TTS.tts.utils.text.japanese.phonemizer import japanese_text_to_phonemes
@@ -45,7 +46,46 @@ def text2phone(text, language):
         ph = japanese_text_to_phonemes(text)
         return ph
 
-    raise ValueError(f" [!] Language {language} is not supported for phonemization.")
+    seperator = phonemizer.separator.Separator(" |", "", "|")
+    # try:
+    punctuations = re.findall(PHONEME_PUNCTUATION_PATTERN, text)
+    if version.parse(phonemizer.__version__) < version.parse("2.1"):
+        ph = phonemize(text, separator=seperator, strip=False, njobs=1, backend="espeak", language=language)
+        ph = ph[:-1].strip()  # skip the last empty character
+        # phonemizer does not tackle punctuations. Here we do.
+        # Replace \n with matching punctuations.
+        if punctuations:
+            # if text ends with a punctuation.
+            if text[-1] == punctuations[-1]:
+                for punct in punctuations[:-1]:
+                    ph = ph.replace("| |\n", "|" + punct + "| |", 1)
+                    ph = ph + punctuations[-1]
+            else:
+                for punct in punctuations:
+                    ph = ph.replace("| |\n", "|" + punct + "| |", 1)
+    elif version.parse(phonemizer.__version__) >= version.parse("2.1"):
+        ph = phonemize(
+            text,
+            separator=seperator,
+            strip=False,
+            njobs=1,
+            backend="espeak",
+            language=language,
+            preserve_punctuation=True,
+            language_switch="remove-flags",
+        )
+        # this is a simple fix for phonemizer.
+        # https://github.com/bootphon/phonemizer/issues/32
+        if punctuations:
+            for punctuation in punctuations:
+                ph = ph.replace(f"| |{punctuation} ", f"|{punctuation}| |").replace(
+                    f"| |{punctuation}", f"|{punctuation}| |"
+                )
+            ph = ph[:-3]
+    else:
+        raise RuntimeError(" [!] Use 'phonemizer' version 2.1 or older.")
+
+    return ph
 
 
 def intersperse(sequence, token):

@@ -438,3 +438,15 @@ def kokoro(root_path, meta_file):
             text = cols[2].replace(" ", "")
             items.append([text, wav_file, speaker_name])
     return items
+
+def infore(root_path, meta_file):
+    txt_file = os.path.join(root_path, meta_file)
+    items = []
+    speaker_name = "infore"
+    with open(txt_file, "r", encoding="utf-8") as ttf:
+        for line in ttf:
+            cols = line.split("|")
+            wav_file = os.path.join(root_path, "wavs", cols[0] + ".wav")
+            text = cols[1]
+            items.append([text, wav_file, speaker_name])
+    return items
